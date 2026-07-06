@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f766e" />
+    <title>GoDigitag Baggage Intake</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">GoDigitag</p>
+          <h1>Baggage Intake</h1>
+        </div>
+        <div class="capture-summary" aria-live="polite">
+          <span id="captureCount">0</span><span>/4 views</span>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="capture-panel" aria-labelledby="captureTitle">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Camera</p>
+              <h2 id="captureTitle">Capture <span id="activeViewLabel">front</span> view</h2>
+            </div>
+            <select id="cameraSelect" class="camera-select" aria-label="Camera source"></select>
+          </div>
+
+          <div class="view-tabs" role="tablist" aria-label="Baggage views">
+            <button class="view-tab active" type="button" data-view="front" role="tab" aria-selected="true">Front</button>
+            <button class="view-tab" type="button" data-view="back" role="tab" aria-selected="false">Back</button>
+            <button class="view-tab" type="button" data-view="top" role="tab" aria-selected="false">Top</button>
+            <button class="view-tab" type="button" data-view="side" role="tab" aria-selected="false">Side</button>
+          </div>
+
+          <div class="camera-stage">
+            <video id="cameraVideo" autoplay playsinline muted></video>
+            <canvas id="photoCanvas" hidden></canvas>
+            <div id="cameraFallback" class="camera-fallback" hidden>
+              <strong>Camera unavailable</strong>
+              <span>Use image upload or allow camera access on localhost.</span>
+            </div>
+            <div class="frame-guide" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          <div class="capture-actions">
+            <button id="startCameraBtn" class="btn secondary" type="button">Start Camera</button>
+            <button id="captureBtn" class="btn primary" type="button" disabled>Capture</button>
+            <label class="btn secondary file-btn" for="imageUpload">Upload</label>
+            <input id="imageUpload" type="file" accept="image/*" capture="environment" />
+          </div>
+
+          <div id="qualityMessage" class="quality-message" aria-live="polite"></div>
+        </section>
+
+        <aside class="review-panel" aria-labelledby="reviewTitle">
+          <div class="panel-head compact">
+            <div>
+              <p class="eyebrow">Review</p>
+              <h2 id="reviewTitle">Required views</h2>
+            </div>
+            <button id="clearBtn" class="text-btn" type="button">Clear</button>
+          </div>
+
+          <div id="viewGrid" class="view-grid"></div>
+        </aside>
+
+        <section class="metadata-panel" aria-labelledby="metadataTitle">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Metadata</p>
+              <h2 id="metadataTitle">Baggage profile</h2>
+            </div>
+            <div class="metadata-actions">
+              <button id="analyzeBtn" class="btn secondary" type="button">Draft</button>
+              <button id="exportBtn" class="btn primary" type="button">Export JSON</button>
+            </div>
+          </div>
+
+          <form id="metadataForm" class="metadata-form">
+            <label>
+              <span>Reference ID</span>
+              <input name="referenceId" type="text" autocomplete="off" placeholder="BAG-0001" />
+            </label>
+            <label>
+              <span>Bag type</span>
+              <select name="bagType">
+                <option value="">Unknown</option>
+                <option>Cabin suitcase</option>
+                <option>Checked suitcase</option>
+                <option>Duffle</option>
+                <option>Backpack</option>
+                <option>Carton</option>
+                <option>Other</option>
+              </select>
+            </label>
+            <label>
+              <span>Primary color</span>
+              <input name="primaryColor" type="text" autocomplete="off" placeholder="Unknown" />
+            </label>
+            <label>
+              <span>Secondary color</span>
+              <input name="secondaryColor" type="text" autocomplete="off" placeholder="Unknown" />
+            </label>
+            <label>
+              <span>Material / texture</span>
+              <input name="texture" type="text" autocomplete="off" placeholder="Unknown" />
+            </label>
+            <label>
+              <span>Scale reference</span>
+              <select name="scaleReference">
+                <option value="">None</option>
+                <option>Measuring tape</option>
+                <option>A4 paper</option>
+                <option>Credit card</option>
+                <option>Floor tile marker</option>
+                <option>Manual dimensions</option>
+              </select>
+            </label>
+            <label>
+              <span>Length (cm)</span>
+              <input name="lengthCm" type="number" min="0" step="0.1" inputmode="decimal" />
+            </label>
+            <label>
+              <span>Width (cm)</span>
+              <input name="widthCm" type="number" min="0" step="0.1" inputmode="decimal" />
+            </label>
+            <label>
+              <span>Height (cm)</span>
+              <input name="heightCm" type="number" min="0" step="0.1" inputmode="decimal" />
+            </label>
+            <label>
+              <span>Wheel count</span>
+              <select name="wheelCount">
+                <option value="">Unknown</option>
+                <option value="0">0</option>
+                <option value="2">2</option>
+                <option value="4">4</option>
+                <option value="6">6</option>
+                <option value="8">8</option>
+              </select>
+            </label>
+            <label>
+              <span>Handle condition</span>
+              <select name="handleCondition">
+                <option value="">Unknown</option>
+                <option>Good</option>
+                <option>Scratched</option>
+                <option>Loose</option>
+                <option>Broken</option>
+                <option>Missing</option>
+              </select>
+            </label>
+            <label>
+              <span>Damage status</span>
+              <select name="damageStatus">
+                <option value="">Unknown</option>
+                <option>No visible damage</option>
+                <option>Minor damage</option>
+                <option>Major damage</option>
+              </select>
+            </label>
+            <label>
+              <span>Model confidence</span>
+              <input name="confidence" type="text" readonly placeholder="Not analyzed" />
+            </label>
+            <label class="wide">
+              <span>Damage notes</span>
+              <textarea name="damageNotes" rows="3" placeholder="Dents, cuts, stains, missing parts"></textarea>
+            </label>
+            <label class="wide">
+              <span>Distinctive marks</span>
+              <textarea name="distinctiveMarks" rows="3" placeholder="Stickers, tags, brand marks, straps"></textarea>
+            </label>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <template id="viewCardTemplate">
+      <article class="view-card">
+        <button class="thumb-btn" type="button">
+          <img alt="" />
+          <span class="empty-thumb">Missing</span>
+        </button>
+        <div class="view-card-body">
+          <div>
+            <h3></h3>
+            <p></p>
+          </div>
+          <button class="retake-btn" type="button">Retake</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
